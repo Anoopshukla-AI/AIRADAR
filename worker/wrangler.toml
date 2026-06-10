@@ -1,0 +1,23 @@
+name = "gtm-intelligence"
+main = "index.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "gtm-intelligence-db"
+database_id = "YOUR_D1_DATABASE_ID"   # Fill after: wrangler d1 create gtm-intelligence-db
+
+# Cron trigger - nightly at 2 AM UTC
+[triggers]
+crons = ["0 2 * * *"]
+
+# Environment variables (secrets set via: wrangler secret put KEY_NAME)
+# NVIDIA_API_KEY
+# HUNTER_API_KEY
+# PDL_API_KEY
+# PIPELINE_SECRET
+
+[vars]
+ENVIRONMENT = "production"

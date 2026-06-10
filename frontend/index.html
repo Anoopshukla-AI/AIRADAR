@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GTM Intelligence — AI-First Startup Radar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ── RESET & BASE ──────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #080C0F;
+      --bg2:       #0E1418;
+      --bg3:       #141C22;
+      --border:    rgba(255,255,255,0.07);
+      --border2:   rgba(255,255,255,0.12);
+      --accent:    #00E5A0;
+      --accent2:   #0066FF;
+      --text:      #E8F0F4;
+      --text2:     #8BA0AD;
+      --text3:     #4A6070;
+      --red:       #FF4757;
+      --yellow:    #FFD32A;
+      --mono:      'DM Mono', monospace;
+      --sans:      'Syne', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE TEXTURE OVERLAY ──────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.6;
+    }
+
+    /* ── GRID BACKGROUND ────────────────────────────────────────────── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%);
+    }
+
+    /* ── HEADER ─────────────────────────────────────────────────────── */
+    header {
+      position: relative;
+      z-index: 10;
+      padding: 2rem 2.5rem 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .logo-area { display: flex; flex-direction: column; gap: 6px; }
+
+    .logo-tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      color: var(--text);
+    }
+
+    h1 span { color: var(--accent); }
+
+    .header-sub {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text3);
+      margin-top: 4px;
+    }
+
+    .nav-links { display: flex; gap: 16px; font-family: var(--mono); font-size: 11px; align-items: center; }
+    .nav-links a { color: var(--text3); text-decoration: none; padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; transition: 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--accent); border-color: rgba(0,229,160,0.3); background: rgba(0,229,160,0.05); }
+
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0,229,160,0.08);
+      border: 1px solid rgba(0,229,160,0.2);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+      white-space: nowrap;
+      margin-top: 8px;
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* ── STATS ROW ──────────────────────────────────────────────────── */
+    .stats-row {
+      position: relative;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1px;
+      margin: 2rem 2.5rem 0;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .stat-box {
+      background: var(--bg2);
+      padding: 1.2rem 1.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      color: var(--text3);
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .stat-value.accent { color: var(--accent); }
+    .stat-value.blue   { color: var(--accent2); }
+
+    .stat-sub {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text3);
+    }
+
+    /* ── CONTROLS ───────────────────────────────────────────────────── */
+    .controls {
+      position: relative;
+      z-index: 10;
+      padding: 1.5rem 2.5rem 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+      max-width: 360px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text3);
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 13px;
+      padding: 9px 12px 9px 36px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input[type="text"]:focus { border-color: var(--accent); }
+    input[type="text"]::placeholder { color: var(--text3); }
+
+    select {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 9px 12px;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+
+    select:focus { border-color: var(--accent); }
+
+    .filter-pill {
+      background: transparent;
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      color: var(--text2);
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .filter-pill:hover, .filter-pill.active {
+      background: rgba(0,229,160,0.1);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── BUTTONS ────────────────────────────────────────────────────── */
+    .action-btn {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 9px 16px;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .action-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .action-btn.primary {
+      background: rgba(0,229,160,0.1);
+      border-color: rgba(0,229,160,0.3);
+      color: var(--accent);
+    }
+    .action-btn.primary:hover {
+      background: rgba(0,229,160,0.2);
+    }
+
+    /* ── MODAL ──────────────────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+      z-index: 100; display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .modal-content {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 2rem; width: 100%; max-width: 400px;
+    }
+    .modal-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; color: var(--text); }
+    .modal-input {
+      width: 100%; background: var(--bg); border: 1px solid var(--border2);
+      border-radius: 8px; color: var(--text); font-family: var(--mono); font-size: 13px;
+      padding: 10px 12px; margin-bottom: 1rem; outline: none;
+    }
+    .modal-input:focus { border-color: var(--accent); }
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+    /* ── MAIN GRID ──────────────────────────────────────────────────── */
+    .grid-wrap {
+      position: relative;
+      z-index: 10;
+      padding: 1.5rem 2.5rem 4rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      margin: 1.5rem 2.5rem 0;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    /* ── COMPANY CARD ───────────────────────────────────────────────── */
+    .card {
+      background: var(--bg2);
+      padding: 1.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: background 0.15s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .card:hover { background: var(--bg3); }
+    .card:hover::before { opacity: 0.6; }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .company-logo {
+      width: 40px; height: 40px; border-radius: 8px; object-fit: cover;
+      background: var(--bg); border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .company-info { flex: 1; min-width: 0; }
+
+    .company-name {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .company-domain {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 2px;
+    }
+
+    /* Score badge */
+    .score-badge {
+      flex-shrink: 0;
+      width: 52px;
+      height: 52px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
+      font-weight: 800;
+      font-size: 22px;
+      letter-spacing: -0.04em;
+      border: 1px solid;
+    }
+
+    .score-badge .score-label {
+      font-family: var(--mono);
+      font-size: 8px;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .score-high   { background: rgba(0,229,160,0.1); color: var(--accent); border-color: rgba(0,229,160,0.25); }
+    .score-mid    { background: rgba(255,211,42,0.1); color: var(--yellow); border-color: rgba(255,211,42,0.25); }
+    .score-low    { background: rgba(255,71,87,0.1);  color: var(--red);    border-color: rgba(255,71,87,0.25); }
+    .score-none   { background: rgba(255,255,255,0.03); color: var(--text3); border-color: var(--border); }
+
+    /* Meta row */
+    .meta-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .meta-chip {
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      color: var(--text3);
+      background: var(--bg);
+      white-space: nowrap;
+    }
+
+    .meta-chip.stage {
+      border-color: rgba(0,102,255,0.3);
+      color: #6EA8FF;
+      background: rgba(0,102,255,0.07);
+    }
+
+    /* Description */
+    .card-desc {
+      font-size: 12px;
+      color: var(--text2);
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Rationale */
+    .rationale {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text2);
+      line-height: 1.6;
+      border-left: 2px solid var(--accent);
+      padding-left: 10px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Outreach angle */
+    .outreach {
+      background: rgba(0,229,160,0.04);
+      border: 1px solid rgba(0,229,160,0.12);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+
+    .outreach-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;
+    }
+
+    .outreach-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .copy-btn {
+      background: transparent; border: 1px solid var(--border2); border-radius: 4px;
+      color: var(--text2); font-family: var(--mono); font-size: 9px; padding: 2px 6px;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    .outreach-text {
+      font-size: 12px;
+      color: var(--text2);
+      line-height: 1.6;
+      font-style: italic;
+    }
+
+    /* Tech stack */
+    .tech-row {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .tech-chip {
+      font-family: var(--mono);
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.04);
+      color: var(--text3);
+      border: 1px solid var(--border);
+    }
+
+    /* Card footer */
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+
+    .card-links { display: flex; gap: 8px; }
+
+    .card-link {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text3);
+      text-decoration: none;
+      padding: 3px 8px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      transition: all 0.15s;
+    }
+
+    .card-link:hover {
+      color: var(--accent);
+      border-color: rgba(0,229,160,0.3);
+    }
+
+    .enriched-time {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--text3);
+    }
+
+    /* ── EMPTY / LOADING STATES ─────────────────────────────────────── */
+    .state-box {
+      grid-column: 1 / -1;
+      padding: 4rem 2rem;
+      text-align: center;
+      color: var(--text3);
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+
+    .loading-dots::after {
+      content: '';
+      animation: dots 1.2s steps(4, end) infinite;
+    }
+
+    @keyframes dots {
+      0%, 20%  { content: ''; }
+      40%      { content: '.'; }
+      60%      { content: '..'; }
+      80%, 100% { content: '...'; }
+    }
+
+    /* ── PAGINATION ─────────────────────────────────────────────────── */
+    .pagination {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 1.5rem 2.5rem;
+    }
+
+    .page-btn {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      color: var(--text2);
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 7px 16px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .page-btn:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .page-info { font-family: var(--mono); font-size: 12px; color: var(--text3); }
+
+    /* ── FOOTER ─────────────────────────────────────────────────────── */
+    footer {
+      position: relative;
+      z-index: 10;
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .footer-left {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    .footer-left a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .footer-right {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    /* ── SCORE BAR ──────────────────────────────────────────────────── */
+    .score-bar-wrap { display: flex; align-items: center; gap: 8px; }
+    .score-bar {
+      flex: 1;
+      height: 3px;
+      background: var(--border2);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.6s ease;
+    }
+
+    /* ── RESPONSIVE ─────────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      header, .controls, .stats-row, .grid-wrap, .pagination, footer {
+        margin-left: 1rem;
+        margin-right: 1rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-area">
+      <span class="logo-tag">// GTM Intelligence</span>
+      <h1>AI-First <span>Startup Radar</span></h1>
+      <p class="header-sub">Global pipeline intelligence · Built by Anoop Shukla</p>
+    </div>
+    
+    <div class="nav-links">
+      <div class="live-badge" style="margin:0 12px 0 0; padding:4px 10px; font-size:9px;">
+        <span class="live-dot"></span> LIVE
+      </div>
+      <a href="/" class="active" id="nav-global" onclick="setDashboardMode('global'); return false;">Radar Dashboard</a>
+      <a href="#" id="nav-leads" onclick="setDashboardMode('leads'); return false;" style="display: none;">My Leads</a>
+      <a href="/scorer.html">ICP Scorer</a>
+      <a href="/templates.html">Template Store</a>
+      <div id="user-profile-container" style="display: flex; align-items: center; margin-left: 12px; position: relative;">
+        <button id="auth-btn" class="btn btn-secondary" style="padding: 6px 12px; font-size: 11px;" onclick="openAuthModal()">Sign In</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- STATS ROW -->
+  <div class="stats-row" id="stats-row">
+    <div class="stat-box">
+      <span class="stat-label">Companies Tracked</span>
+      <span class="stat-value accent" id="stat-total">—</span>
+      <span class="stat-sub">AI-first startups</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Enriched & Scored</span>
+      <span class="stat-value" id="stat-enriched">—</span>
+      <span class="stat-sub">with ICP scores</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Avg ICP Score</span>
+      <span class="stat-value accent" id="stat-avg">—</span>
+      <span class="stat-sub">out of 100</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Top Stage</span>
+      <span class="stat-value blue" id="stat-stage" style="font-size:1.3rem;margin-top:4px">—</span>
+      <span class="stat-sub">by count</span>
+    </div>
+    <div class="stat-box" id="stat-crm-box" style="display: none;">
+      <span class="stat-label">My CRM Leads</span>
+      <span class="stat-value" style="color: var(--accent)" id="stat-crm-count">—</span>
+      <span class="stat-sub">Saved companies</span>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="search-input" placeholder="Search companies, tech, tags..." />
+    </div>
+    <select id="sort-select">
+      <option value="icp_score">Sort: ICP Score</option>
+      <option value="last_funding_date">Sort: Latest Funding</option>
+      <option value="funding_total_usd">Sort: Funding Amount</option>
+      <option value="name">Sort: Name A-Z</option>
+    </select>
+    <select id="stage-filter">
+      <option value="all">All Stages</option>
+      <option value="Seed">Seed</option>
+      <option value="Series A">Series A</option>
+      <option value="Series B">Series B</option>
+      <option value="Series C">Series C</option>
+      <option value="Series D">Series D</option>
+    </select>
+    <button class="filter-pill active" id="pill-all" onclick="setScoreFilter('all')">All</button>
+    <button class="filter-pill" id="pill-high" onclick="setScoreFilter('high')">Score 70+</button>
+    <button class="filter-pill" id="pill-mid" onclick="setScoreFilter('mid')">Score 40–69</button>
+    <div style="flex: 1"></div>
+    <button class="action-btn" onclick="exportCSV()">Export CSV</button>
+    <button class="action-btn primary" onclick="showAddModal()">+ Add Startup</button>
+  </div>
+
+  <!-- GRID -->
+  <div class="grid-wrap" id="grid">
+    <div class="state-box"><span class="loading-dots">Loading intelligence</span></div>
+  </div>
+
+  <!-- PAGINATION -->
+  <div class="pagination">
+    <button class="page-btn" id="btn-prev" onclick="changePage(-1)">← Prev</button>
+    <span class="page-info" id="page-info">Page 1</span>
+    <button class="page-btn" id="btn-next" onclick="changePage(1)">Next →</button>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-left">
+      Built by <a href="https://github.com/Anoopshukla-AI" target="_blank">Anoop Shukla</a>
+      · GTM Engineer · AI Automation Engineer
+      · <a href="https://clawoperator.ct.ws" target="_blank">ClawOperator</a>
+    </div>
+    <div class="footer-right" id="last-updated">Updated: —</div>
+  </footer>
+
+  <!-- ADD STARTUP MODAL -->
+  <div class="modal-overlay" id="add-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center;">
+    <div class="modal-content" style="background: var(--bg2); border: 1px solid var(--border); padding: 24px; border-radius: 12px; max-width: 400px; width: 100%;">
+      <div class="modal-title">Add New Startup</div>
+      <input type="text" id="add-domain" class="modal-input" placeholder="e.g. anthropic.com" />
+      <div class="modal-actions">
+        <button class="action-btn" onclick="hideAddModal()">Cancel</button>
+        <button class="action-btn primary" id="add-btn-submit" onclick="submitStartup()">Add & Enrich</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTH MODAL -->
+  <div class="modal-overlay" id="auth-modal" style="display: none;">
+    <div class="modal" style="max-width: 400px; text-align: center;">
+      <div class="modal-header" style="justify-content: center; position: relative;">
+        <h2 style="font-size: 1.5rem;">Join GTM Intelligence</h2>
+        <button class="modal-close" onclick="closeAuthModal()" style="position: absolute; right: 0;">✕</button>
+      </div>
+      <p style="color: var(--text2); font-size: 13px; font-family: var(--mono); margin-bottom: 2rem;">Unlock 200+ verified AI leads and save your custom ICP.</p>
+      
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <button class="btn btn-primary" onclick="openGooglePicker()" style="background: white; color: black; border: none; font-family: var(--sans); font-size: 14px; display:flex; align-items:center; justify-content:center; gap:10px;">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" height="18" />
+          Continue with Google
+        </button>
+        <button class="btn btn-secondary" onclick="alert('Phone auth mock coming soon.')" style="font-family: var(--sans); font-size: 14px;">
+          Continue with Phone Number
+        </button>
+        <div style="margin: 1rem 0; color: var(--text3); font-size: 11px; font-family: var(--mono);">OR</div>
+        <input type="email" id="mock-email-input" class="input-field" placeholder="Email address" style="margin-bottom: 8px;" />
+        <button class="btn btn-primary" onclick="mockLoginEmail()" style="font-family: var(--sans); font-size: 14px;">
+          Continue with Email
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOCK GOOGLE ACCOUNT PICKER -->
+  <div class="modal-overlay" id="google-picker-modal" style="display: none; z-index: 10000; background: rgba(0,0,0,0.8);">
+    <div class="modal" style="max-width: 400px; background: white; color: #202124; font-family: 'Roboto', sans-serif; border-radius: 8px; padding: 24px;">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="32" height="32" style="margin-bottom: 12px;" />
+        <h2 style="font-size: 20px; font-weight: 500; margin-bottom: 8px; color: #202124;">Sign in with Google</h2>
+        <p style="font-size: 14px; color: #5f6368;">Choose an account to continue to <b>GTM Intelligence</b></p>
+      </div>
+      
+      <div style="display: flex; flex-direction: column; border-top: 1px solid #e8eaed; border-bottom: 1px solid #e8eaed;">
+        <div onclick="mockLogin('founder@startup.com', 'https://ui-avatars.com/api/?name=Founder&background=00E5A0&color=fff')" style="display: flex; align-items: center; padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #e8eaed;">
+          <img src="https://ui-avatars.com/api/?name=Founder&background=00E5A0&color=fff&rounded=true" width="36" height="36" style="border-radius: 50%; margin-right: 12px;" />
+          <div style="text-align: left;">
+            <div style="font-weight: 500; font-size: 14px; color: #3c4043;">Founder</div>
+            <div style="font-size: 12px; color: #5f6368;">founder@startup.com</div>
+          </div>
+        </div>
+        <div onclick="mockLogin('sales@enterprise.com', 'https://ui-avatars.com/api/?name=Sales+Rep&background=0066FF&color=fff')" style="display: flex; align-items: center; padding: 12px 16px; cursor: pointer;">
+          <img src="https://ui-avatars.com/api/?name=Sales+Rep&background=0066FF&color=fff&rounded=true" width="36" height="36" style="border-radius: 50%; margin-right: 12px;" />
+          <div style="text-align: left;">
+            <div style="font-weight: 500; font-size: 14px; color: #3c4043;">Sales Rep</div>
+            <div style="font-size: 12px; color: #5f6368;">sales@enterprise.com</div>
+          </div>
+        </div>
+        
+        <!-- Custom Account Entry -->
+        <div id="custom-google-entry" style="padding: 12px 16px; border-top: 1px solid #e8eaed; display: none;">
+          <input type="email" id="custom-google-email" placeholder="Email or phone" style="width: 100%; padding: 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 14px; margin-bottom: 12px; outline: none;" />
+          <button onclick="mockLoginGoogleCustom()" style="background: #1a73e8; color: white; border: none; padding: 10px 24px; border-radius: 4px; font-weight: 500; cursor: pointer; float: right;">Next</button>
+          <div style="clear: both;"></div>
+        </div>
+
+        <div onclick="document.getElementById('custom-google-entry').style.display='block'" style="display: flex; align-items: center; padding: 12px 16px; cursor: pointer; color: #3c4043; font-weight: 500; font-size: 14px;">
+          <div style="width: 36px; height: 36px; border-radius: 50%; margin-right: 12px; display: flex; align-items: center; justify-content: center; color: #5f6368; font-size: 18px;">
+            <svg viewBox="0 0 24 24" width="20" height="20"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="currentColor"/></svg>
+          </div>
+          Use another account
+        </div>
+      </div>
+      <div style="text-align: right; margin-top: 24px;">
+        <button onclick="closeGooglePicker()" style="background: none; border: none; color: #1a73e8; font-weight: 500; cursor: pointer; padding: 8px;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+// ── CONFIG & STATE ───────────────────────────────────────────────────────
+const WORKER_BASE = window.location.hostname === 'localhost' ? 'http://localhost:8787' : 'https://gtm-intelligence.YOUR_SUBDOMAIN.workers.dev';
+window.currentUser = null; // Mock state
+
+function openAuthModal() { document.getElementById('auth-modal').style.display = 'flex'; }
+function closeAuthModal() { document.getElementById('auth-modal').style.display = 'none'; }
+function openGooglePicker() { document.getElementById('google-picker-modal').style.display = 'flex'; }
+function closeGooglePicker() { document.getElementById('google-picker-modal').style.display = 'none'; }
+
+function mockLoginEmail() {
+  const email = document.getElementById('mock-email-input').value || 'user@example.com';
+  const name = email.split('@')[0];
+  mockLogin(email, `https://ui-avatars.com/api/?name=${name}&background=random&color=fff`);
+}
+
+function showAddModal() {
+  if (!window.currentUser) {
+    alert("Please sign in to add startups.");
+    return openAuthModal();
+  }
+  document.getElementById('add-modal').style.display = 'flex';
+}
+
+function hideAddModal() {
+  document.getElementById('add-modal').style.display = 'none';
+}
+
+function submitStartup() {
+  const domain = document.getElementById('add-domain').value.trim();
+  if (!domain) return alert("Domain required");
+  document.getElementById('add-btn-submit').innerText = 'Enriching...';
+  setTimeout(() => {
+    alert("Startup added to queue!");
+    document.getElementById('add-domain').value = '';
+    document.getElementById('add-btn-submit').innerText = 'Add & Enrich';
+    hideAddModal();
+  }, 1000);
+}
+
+function exportCSV() {
+  if (!state.currentData || state.currentData.length === 0) {
+    return alert("No data to export");
+  }
+  const headers = ["Name", "Domain", "Stage", "Score", "Rationale"];
+  const rows = state.currentData.map(c => [
+    c.name, c.domain, c.funding_stage || '', c.icp_score || '', `"${(c.icp_rationale||'').replace(/"/g, '""')}"`
+  ]);
+  const csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\\n" + rows.map(e => e.join(",")).join("\\n");
+  const link = document.createElement("a");
+  link.setAttribute("href", encodeURI(csvContent));
+  link.setAttribute("download", "gtm_startups.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+function mockLoginGoogleCustom() {
+  const email = document.getElementById('custom-google-email').value;
+  if (!email) return alert('Please enter a valid email');
+  const name = email.split('@')[0];
+  mockLogin(email, `https://ui-avatars.com/api/?name=${name}&background=1a73e8&color=fff`);
+}
+
+function mockLogin(email, avatarUrl) {
+  const MOCK_TOKEN = "eyJhbGciOiJub25lIn0.eyJzdWIiOiJtb2NrLXVzZXItMSJ9.signature";
+  window.currentUser = { token: MOCK_TOKEN, email: email, avatar: avatarUrl }; 
+  closeAuthModal();
+  closeGooglePicker();
+  
+  // Show My Leads nav
+  document.getElementById('nav-leads').style.display = 'inline-block';
+  document.getElementById('stat-crm-box').style.display = 'flex';
+  
+  // Render Profile Header Pill
+  const container = document.getElementById('user-profile-container');
+  container.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05); padding: 4px 12px 4px 4px; border-radius: 20px; border: 1px solid var(--border2); cursor: pointer;" onclick="mockLogout()">
+      <img src="${avatarUrl}" width="24" height="24" style="border-radius: 50%;" />
+      <span style="font-size: 12px; font-family: var(--mono); color: var(--text2);">${email}</span>
+    </div>
+  `;
+  
+  fetchCompanies(state.page); // Re-render dashboard
+}
+
+function mockLogout() {
+  window.currentUser = null;
+  document.getElementById('nav-leads').style.display = 'none';
+  document.getElementById('stat-crm-box').style.display = 'none';
+  state.dashboardMode = 'global';
+  document.getElementById('nav-global').classList.add('active');
+  document.getElementById('nav-leads').classList.remove('active');
+  const container = document.getElementById('user-profile-container');
+  container.innerHTML = `<button id="auth-btn" class="btn btn-secondary" style="padding: 6px 12px; font-size: 11px;" onclick="openAuthModal()">Sign In</button>`;
+  fetchCompanies(state.page); // Re-render dashboard
+}
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let state = {
+  page: 1,
+  limit: 20,
+  total: 0,
+  pages: 0,
+  sort: 'icp_score',
+  stage: 'all',
+  scoreFilter: 'all',
+  searchQuery: '',
+  searchMode: false,
+  currentData: [],
+  dashboardMode: 'global', // 'global' or 'leads'
+  myLeads: [] // Cache of user's saved leads
+};
+
+function setDashboardMode(mode) {
+  state.dashboardMode = mode;
+  document.getElementById('nav-global').classList.toggle('active', mode === 'global');
+  document.getElementById('nav-leads').classList.toggle('active', mode === 'leads');
+  if (mode === 'leads' && !window.currentUser) {
+    return openAuthModal();
+  }
+  fetchCompanies(1);
+}
+
+async function saveLead(companyId, btnElement) {
+  if (!window.currentUser) return openAuthModal();
+  try {
+    const res = await fetch(`${WORKER_BASE}/api/leads`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${window.currentUser.token}`
+      },
+      body: JSON.stringify({ company_id: companyId })
+    });
+    if (res.ok) {
+      btnElement.style.color = 'var(--accent)';
+      btnElement.innerText = 'Saved';
+      // Refresh cache in background
+      fetchMyLeads();
+    }
+  } catch (e) { console.error("Failed to save lead", e); }
+}
+
+async function fetchMyLeads() {
+  if (!window.currentUser) return;
+  try {
+    const res = await fetch(`${WORKER_BASE}/api/leads`, {
+      headers: { 'Authorization': `Bearer ${window.currentUser.token}` }
+    });
+    if (res.ok) {
+      state.myLeads = await res.json();
+      document.getElementById('stat-crm-count').textContent = state.myLeads.length;
+    }
+  } catch (e) { console.error("Failed to fetch leads", e); }
+}
+
+// ── SCORE HELPERS ─────────────────────────────────────────────────────────────
+function scoreClass(score) {
+  if (score === null || score === undefined) return 'score-none';
+  if (score >= 70) return 'score-high';
+  if (score >= 40) return 'score-mid';
+  return 'score-low';
+}
+
+function scoreColor(score) {
+  if (score === null || score === undefined) return 'var(--text3)';
+  if (score >= 70) return 'var(--accent)';
+  if (score >= 40) return 'var(--yellow)';
+  return 'var(--red)';
+}
+
+function formatFunding(usd) {
+  if (!usd) return null;
+  if (usd >= 1e9) return `$${(usd/1e9).toFixed(1)}B`;
+  if (usd >= 1e6) return `$${(usd/1e6).toFixed(1)}M`;
+  if (usd >= 1e3) return `$${(usd/1e3).toFixed(0)}K`;
+  return `$${usd}`;
+}
+
+function timeAgo(iso) {
+  if (!iso) return '';
+  const diff = Date.now() - new Date(iso).getTime();
+  const h = Math.floor(diff / 3600000);
+  if (h < 1) return 'just now';
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h/24)}d ago`;
+}
+
+function parseTags(str) {
+  try { return JSON.parse(str || '[]'); } catch { return []; }
+}
+
+// ── RENDER CARD ───────────────────────────────────────────────────────────────
+function renderCard(company, index) {
+  const score = company.icp_score;
+  const sClass = scoreClass(score);
+  const tech = parseTags(company.tech_stack).slice(0, 5);
+  const funding = formatFunding(company.funding_total_usd);
+  const domainHost = company.domain.replace(/^www\./, '');
+  const enrichedAgo = company.enriched_at ? timeAgo(company.enriched_at) : '';
+  
+  const isBlurred = index >= 5 && !window.currentUser && state.dashboardMode === 'global';
+  const cardStyle = isBlurred ? 'filter: blur(5px) grayscale(100%); pointer-events: none; opacity: 0.6; user-select: none;' : '';
+
+  const isSaved = state.myLeads.some(l => l.id === company.id);
+  const saveBtnHtml = window.currentUser ? 
+    `<button onclick="saveLead(${company.id}, this)" style="background: none; border: none; cursor: pointer; color: ${isSaved ? 'var(--accent)' : 'var(--text3)'}; font-family: var(--sans); font-size: 11px;">
+      ${isSaved ? 'Saved' : 'Save Lead'}
+     </button>` : '';
+
+  return `
+    <div class="card" style="${cardStyle}">
+      <div class="card-top">
+        <img src="https://logo.clearbit.com/${company.domain}" class="company-logo" onerror="this.style.display='none'" alt="logo" />
+        <div class="company-info">
+          <div style="display: flex; justify-content: space-between; align-items: start;">
+            <div class="company-name">${company.name || company.domain}</div>
+            ${saveBtnHtml}
+          </div>
+          <div class="company-domain">${company.domain}</div>
+        </div>
+        <div class="score-badge ${sClass}" title="${(company.icp_rationale || 'Pending Score').replace(/"/g, '&quot;')}">
+          ${score !== null && score !== undefined ? score : '–'}
+          <span class="score-label">ICP</span>
+        </div>
+      </div>
+
+      <div class="meta-row">
+        ${company.funding_stage ? `<span class="meta-chip stage">${company.funding_stage}</span>` : ''}
+        ${funding ? `<span class="meta-chip">${funding}</span>` : ''}
+        ${company.headcount_range ? `<span class="meta-chip">${company.headcount_range} ppl</span>` : ''}
+        ${company.hq_country ? `<span class="meta-chip">${company.hq_city ? company.hq_city + ', ' : ''}${company.hq_country}</span>` : ''}
+      </div>
+
+      ${company.description ? `<div class="card-desc">${company.description}</div>` : ''}
+
+      ${company.icp_rationale ? `<div class="rationale">${company.icp_rationale}</div>` : ''}
+
+      ${company.outreach_angle ? `
+        <div class="outreach">
+          <div class="outreach-header">
+            <div class="outreach-label">// Outreach angle</div>
+            <button class="copy-btn" onclick="copyText(this, \`${company.outreach_angle.replace(/`/g, '\\`')}\`)">Copy</button>
+          </div>
+          <div class="outreach-text">${company.outreach_angle}</div>
+        </div>` : ''}
+
+      ${tech.length ? `
+        <div class="tech-row">
+          ${tech.map(t => `<span class="tech-chip">${t}</span>`).join('')}
+        </div>` : ''}
+
+      <div class="card-footer">
+        <div class="card-links">
+          <a class="card-link" href="https://${company.domain}" target="_blank">↗ website</a>
+          ${company.linkedin_url ? `<a class="card-link" href="${company.linkedin_url}" target="_blank">linkedin</a>` : ''}
+          <a class="card-link" href="/scorer.html?domain=${company.domain}" style="color:var(--accent); border-color:rgba(0,229,160,0.3);" title="Score against your own ICP criteria">Customize Score →</a>
+        </div>
+        <span class="enriched-time">${enrichedAgo ? `scored ${enrichedAgo}` : 'pending score'}</span>
+      </div>
+    </div>`;
+}
+
+// ── FETCH COMPANIES ───────────────────────────────────────────────────────────
+async function fetchCompanies(page = 1) {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '<div class="state-box"><span class="loading-dots">Loading intelligence</span></div>';
+
+  try {
+    let url, data;
+
+    if (state.dashboardMode === 'leads') {
+      await fetchMyLeads();
+      const companies = state.myLeads;
+      state.currentData = companies;
+      state.total = companies.length;
+      state.pages = 1;
+      
+      document.getElementById('page-info').textContent = `Page 1 of 1`;
+      document.getElementById('btn-prev').disabled = true;
+      document.getElementById('btn-next').disabled = true;
+
+      if (!companies.length) {
+        grid.innerHTML = '<div class="state-box">You haven\\'t saved any leads yet.</div>';
+        return;
+      }
+
+      grid.innerHTML = companies.map((c, i) => renderCard(c, i)).join('');
+      return;
+    }
+
+    if (state.searchMode && state.searchQuery.length >= 2) {
+      url = `${WORKER_BASE}/api/search?q=${encodeURIComponent(state.searchQuery)}`;
+      const res = await fetch(url);
+      const json = await res.json();
+      data = { data: json.results, pagination: { total: json.results.length, page: 1, pages: 1 } };
+    } else {
+      const params = new URLSearchParams({
+        page: state.page,
+        limit: state.limit,
+        sort: state.sort,
+        order: 'DESC',
+      });
+      if (state.stage !== 'all') params.set('stage', state.stage);
+      if (state.scoreFilter === 'high') params.set('min_score', '70');
+      if (state.scoreFilter === 'mid') { params.set('min_score', '40'); params.set('max_score', '69'); }
+
+      const res = await fetch(`${WORKER_BASE}/api/companies?${params}`);
+      data = await res.json();
+    }
+
+    const companies = data.data || [];
+    state.currentData = companies;
+    const pagination = data.pagination || {};
+
+    state.total = pagination.total || companies.length;
+    state.pages = pagination.pages || 1;
+
+    document.getElementById('page-info').textContent = `Page ${state.page} of ${state.pages}`;
+    document.getElementById('btn-prev').disabled = state.page <= 1;
+    document.getElementById('btn-next').disabled = state.page >= state.pages;
+
+    if (!companies.length) {
+      grid.innerHTML = '<div class="state-box">No companies found matching your filters.</div>';
+      return;
+    }
+
+    grid.innerHTML = companies.map((c, i) => renderCard(c, i)).join('');
+
+    if (!window.currentUser && companies.length > 5 && state.dashboardMode === 'global') {
+      const cta = document.createElement('div');
+      cta.style.cssText = "grid-column: 1 / -1; text-align: center; margin-top: 2rem; position: relative; z-index: 10;";
+      cta.innerHTML = `<button class="btn btn-primary" onclick="openAuthModal()" style="font-size: 16px; padding: 16px 32px; box-shadow: 0 0 30px rgba(0,229,160,0.2);">Log in to unlock ${pagination.total} leads</button>`;
+      grid.appendChild(cta);
+    }
+  } catch (err) {
+    console.error(err);
+    grid.innerHTML = `<div class="state-box">
+      Could not connect to intelligence pipeline.<br/>
+      <span style="font-size:10px;margin-top:8px;display:block">
+        Make sure WORKER_BASE is set to your Cloudflare Worker URL.
+      </span>
+    </div>`;
+  }
+}
+
+// ── FETCH STATS ───────────────────────────────────────────────────────────────
+async function fetchStats() {
+  try {
+    const res = await fetch(`${WORKER_BASE}/api/stats`);
+    const s = await res.json();
+    document.getElementById('stat-total').textContent = s.total_companies || 0;
+    document.getElementById('stat-enriched').textContent = s.enriched_companies || 0;
+    document.getElementById('stat-avg').textContent = s.avg_icp_score || '—';
+    const topStage = s.top_stages?.[0];
+    document.getElementById('stat-stage').textContent = topStage ? topStage.funding_stage : '—';
+    if (s.last_updated) {
+      document.getElementById('last-updated').textContent = `Updated: ${timeAgo(s.last_updated)}`;
+    }
+  } catch { /* stats are non-critical */ }
+}
+
+// ── CONTROLS ──────────────────────────────────────────────────────────────────
+function setScoreFilter(filter) {
+  state.scoreFilter = filter;
+  state.page = 1;
+  ['all','high','mid'].forEach(f => {
+    document.getElementById(`pill-${f}`).classList.toggle('active', f === filter);
+  });
+  fetchCompanies();
+}
+
+function changePage(delta) {
+  const next = state.page + delta;
+  if (next < 1 || next > state.pages) return;
+  state.page = next;
+  fetchCompanies();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function copyText(btn, text) {
+  navigator.clipboard.writeText(text).catch(() => {});
+  const old = btn.textContent;
+  btn.textContent = 'Copied!';
+  setTimeout(() => btn.textContent = old, 2000);
+}
+
+function exportCSV() {
+  const data = state.currentData;
+  if (!data || !data.length) return alert("No data to export.");
+  const headers = ['Name', 'Domain', 'ICP Score', 'Stage', 'Funding', 'Country', 'Outreach Angle'];
+  const rows = data.map(c => [
+    c.name, c.domain, c.icp_score || '', c.funding_stage || '', 
+    c.funding_total_usd || '', c.hq_country || '', c.outreach_angle || ''
+  ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','));
+  const csv = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'gtm-leads.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function showAddModal() {
+  document.getElementById('add-modal').style.display = 'flex';
+}
+
+function hideAddModal() {
+  document.getElementById('add-modal').style.display = 'none';
+  document.getElementById('add-domain').value = '';
+}
+
+async function submitStartup() {
+  const domain = document.getElementById('add-domain').value.trim();
+  if (!domain) return;
+  const btn = document.getElementById('add-btn-submit');
+  btn.disabled = true;
+  btn.textContent = 'Enriching...';
+  try {
+    const res = await fetch(`${WORKER_BASE}/api/companies/add`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ domain })
+    });
+    const data = await res.json();
+    if (data.error) alert(data.error);
+    else {
+      state.searchMode = false;
+      document.getElementById('search-input').value = '';
+      state.page = 1;
+      fetchCompanies();
+      fetchStats();
+      hideAddModal();
+    }
+  } catch (e) {
+    alert('Failed to add startup. Make sure Worker API is running.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Add & Enrich';
+  }
+}
+
+// Debounce search
+let searchTimer;
+document.getElementById('search-input').addEventListener('input', e => {
+  clearTimeout(searchTimer);
+  const q = e.target.value.trim();
+  searchTimer = setTimeout(() => {
+    state.searchQuery = q;
+    state.searchMode = q.length >= 2;
+    state.page = 1;
+    fetchCompanies();
+  }, 350);
+});
+
+document.getElementById('sort-select').addEventListener('change', e => {
+  state.sort = e.target.value;
+  state.page = 1;
+  fetchCompanies();
+});
+
+document.getElementById('stage-filter').addEventListener('change', e => {
+  state.stage = e.target.value;
+  state.page = 1;
+  fetchCompanies();
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+fetchStats();
+fetchCompanies();
+
+// Refresh stats every 5 minutes
+setInterval(fetchStats, 5 * 60 * 1000);
+</script>
+</body>
+</html>

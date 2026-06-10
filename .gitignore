@@ -1,0 +1,19 @@
+# Environment variables - NEVER commit these
+.env
+.env.local
+*.env
+.dev.vars
+
+# Node
+node_modules/
+dist/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Wrangler
+.wrangler/
