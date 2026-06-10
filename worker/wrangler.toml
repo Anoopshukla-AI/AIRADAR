@@ -7,7 +7,7 @@ compatibility_flags = ["nodejs_compat"]
 [[d1_databases]]
 binding = "DB"
 database_name = "gtm-intelligence-db"
-database_id = "YOUR_D1_DATABASE_ID"   # Fill after: wrangler d1 create gtm-intelligence-db
+database_id = "da40c5c1-d9b8-4ca5-bf1c-9bbf0d9f171f"
 
 # Cron trigger - nightly at 2 AM UTC
 [triggers]
