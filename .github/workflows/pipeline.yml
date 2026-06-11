@@ -28,7 +28,7 @@ jobs:
 
       - name: Run enrichment pipeline
         env:
-          OPENAI_API_KEY:   ${{ secrets.OPENAI_API_KEY }}
+          NVIDIA_API_KEY:   ${{ secrets.NVIDIA_API_KEY }}
           PDL_API_KEY:      ${{ secrets.PDL_API_KEY }}
           HUNTER_API_KEY:   ${{ secrets.HUNTER_API_KEY }}
           WORKER_URL:       ${{ secrets.WORKER_URL }}

@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Personalized ICP Scorer — GTM Intelligence</title>
+  <title>ICP Scorer — AIRadar | Score AI Startups Against Your Ideal Customer Profile</title>
+  <meta name="description" content="Define your ICP and score 500+ AI-first startups instantly. Built into AIRadar — the live AI startup dealflow engine." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -110,28 +111,49 @@
   </header>
 
   <div class="container">
-    <!-- INPUT PANEL -->
+    <!-- INPUT PANEL (WIZARD) -->
     <div class="panel">
-      <div class="panel-title">Define your ICP</div>
-      <div class="form-group" style="display: flex; gap: 1rem; align-items: flex-end;">
-        <div style="flex: 1;">
-          <label>Target Domain(s)</label>
-          <input type="text" id="domain-input" placeholder="e.g. anthropic.com" />
-        </div>
-        <div style="color: var(--text3); font-family: var(--mono); font-size: 11px; padding-bottom: 12px;">OR</div>
-        <div style="flex: 1;">
-          <label>Bulk CSV Upload</label>
-          <input type="file" id="csv-upload" accept=".csv" style="display: none;" onchange="handleFileUpload()" />
-          <button class="submit-btn" style="padding: 12px; background: transparent; border-style: dashed; color: var(--text2);" onclick="document.getElementById('csv-upload').click()">Upload CSV List</button>
-          <div id="file-name-display" class="hint" style="color: var(--accent); display: none;"></div>
-        </div>
-      </div>
+      <div class="panel-title">ICP Wizard</div>
+      <p style="font-family: var(--mono); font-size: 11px; color: var(--text3); margin-bottom: 1.5rem;">
+        Define your ideal customer to generate a tailored scoring formula.
+      </p>
+
       <div class="form-group">
-        <label>Ideal Customer Profile (2 Sentences)</label>
-        <textarea id="icp-input" placeholder="e.g. We sell SOC2 compliance software to B2B SaaS companies with 50+ employees who recently raised Series A. They must have a software product."></textarea>
-        <div class="hint">The AI will strictly evaluate the domain(s) against this exact definition.</div>
+        <label>1. Target Geography</label>
+        <select id="wiz-geo" style="width:100%; background:var(--bg); border:1px solid var(--border2); color:var(--text); padding:10px; border-radius:8px;">
+          <option value="Global">Global</option>
+          <option value="US">United States only</option>
+          <option value="EU">Europe only</option>
+        </select>
       </div>
-      <button class="submit-btn" id="score-btn" onclick="scoreDomain()">Score Lead</button>
+
+      <div class="form-group">
+        <label>2. Target Category</label>
+        <select id="wiz-category" style="width:100%; background:var(--bg); border:1px solid var(--border2); color:var(--text); padding:10px; border-radius:8px;">
+          <option value="Any">Any AI category</option>
+          <option value="AI Infrastructure">AI Infrastructure / Dev Tools</option>
+          <option value="AI Agents">AI Agents / Copilots</option>
+          <option value="Enterprise AI">Enterprise AI / Search</option>
+          <option value="Vertical SaaS">Vertical SaaS / Apps</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>3. Ideal Stage</label>
+        <select id="wiz-stage" style="width:100%; background:var(--bg); border:1px solid var(--border2); color:var(--text); padding:10px; border-radius:8px;">
+          <option value="Any">Any Stage</option>
+          <option value="Seed">Seed (Early, small teams)</option>
+          <option value="Series A">Series A (Finding PMF)</option>
+          <option value="Series B+">Series B+ (Scaling GTM)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>4. Required Tech Stack (Optional)</label>
+        <input type="text" id="wiz-tech" placeholder="e.g. Python, React, OpenAI" />
+      </div>
+
+      <button class="submit-btn" id="generate-btn" onclick="generateAndSaveICP()">Generate & Save ICP Profile</button>
     </div>
 
     <!-- RESULTS PANEL -->
@@ -143,11 +165,12 @@
       </div>
 
       <div id="results-area">
-        <div class="score-circle" id="res-score">
-          0<span>ICP SCORE</span>
+      <div id="results-area">
+        <div class="rationale-box" id="res-rationale" style="font-size: 14px; color: var(--accent); margin-bottom: 1.5rem;"></div>
+        
+        <div style="display:flex; gap:12px;">
+          <a href="/" class="submit-btn" style="text-decoration:none; text-align:center; display:block;">Go to "Your Radar"</a>
         </div>
-        <div class="signals-list" id="res-signals"></div>
-        <div class="rationale-box" id="res-rationale"></div>
       </div>
       
       <div id="empty-state" style="text-align:center; color:var(--text3); font-family:var(--mono); font-size:12px; padding: 4rem 0;">
@@ -209,118 +232,49 @@
           for (let part of parts) {
             part = part.trim().replace(/['"]/g, '');
             if (part.includes('.')) {
-              uploadedDomains.push(part);
-              break;
-            }
-          }
-        }
-      };
-      reader.readAsText(file);
-    }
+    async function generateAndSaveICP() {
+      const geo = document.getElementById('wiz-geo').value;
+      const cat = document.getElementById('wiz-category').value;
+      const stage = document.getElementById('wiz-stage').value;
+      const tech = document.getElementById('wiz-tech').value;
 
-    async function scoreDomain() {
-      const domain = document.getElementById('domain-input').value.trim();
-      const custom_icp = document.getElementById('icp-input').value.trim();
-      const isBulk = uploadedDomains.length > 0;
-      
-      if ((!domain && !isBulk) || !custom_icp) {
-        alert("Both domain(s) and ICP definition are required.");
-        return;
-      }
-
-      if (isBulk && uploadedDomains.length > 50) {
-        alert("Max 50 domains allowed for bulk processing.");
-        return;
-      }
-
-      // Save the ICP to the user's profile automatically
-      if (window.currentUser) {
-        fetch(`${WORKER_BASE}/api/user/profile`, {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${window.currentUser.token}`
-          },
-          body: JSON.stringify({ saved_icp: custom_icp })
-        }).catch(e => console.error("Failed to save ICP:", e));
-      }
+      let icpString = `We target ${stage !== 'Any' ? stage : 'AI'} companies`;
+      if (cat !== 'Any') icpString += ` in the ${cat} sector`;
+      if (geo !== 'Global') icpString += ` based in ${geo}`;
+      if (tech) icpString += ` using ${tech} in their tech stack`;
+      icpString += `.`;
 
       document.getElementById('empty-state').style.display = 'none';
       document.getElementById('results-area').style.display = 'none';
       document.getElementById('loading').style.display = 'block';
-      const btn = document.getElementById('score-btn');
+      const btn = document.getElementById('generate-btn');
       btn.disabled = true;
 
-        const payload = isBulk ? { domains: uploadedDomains, custom_icp } : { domain, custom_icp };
-
-        const res = await fetch(`${WORKER_BASE}/api/score-custom`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        
-        const data = await res.json();
-        if (data.error) throw new Error(data.error);
-
-        if (isBulk) {
-          document.getElementById('loading').style.display = 'none';
-          document.getElementById('empty-state').innerText = "Bulk scoring complete! Downloading CSV...";
-          document.getElementById('empty-state').style.display = 'block';
-          downloadBulkCSV(data.results);
-          return;
+      try {
+        if (window.currentUser) {
+          const res = await fetch(`${WORKER_BASE}/api/user/profile`, {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${window.currentUser.token}`
+            },
+            body: JSON.stringify({ saved_icp: icpString })
+          });
+          if (!res.ok) throw new Error("Failed to save to backend.");
         }
-
-        // Render single results
-        const scoreCircle = document.getElementById('res-score');
-        scoreCircle.innerHTML = `${data.icp_score}<span>ICP SCORE</span>`;
-        if (data.icp_score >= 70) scoreCircle.style.color = 'var(--accent)';
-        else if (data.icp_score >= 40) scoreCircle.style.color = 'var(--yellow)';
-        else scoreCircle.style.color = 'var(--red)';
-
-        document.getElementById('res-rationale').textContent = data.rationale;
-
-        const signalsList = document.getElementById('res-signals');
-        signalsList.innerHTML = data.signal_breakdown.map(s => `
-          <div class="signal-item ${s.met ? 'signal-met' : 'signal-missed'}">
-            <div class="signal-icon">${s.met ? '✓' : '✗'}</div>
-            <div>${s.signal}</div>
-          </div>
-        `).join('');
 
         document.getElementById('loading').style.display = 'none';
         document.getElementById('results-area').style.display = 'block';
-
+        document.getElementById('res-rationale').textContent = `Generated Profile: "${icpString}" (Saved to your account)`;
       } catch (e) {
-        alert("Scoring failed: " + e.message);
+        alert("Failed to save ICP: " + e.message);
         document.getElementById('loading').style.display = 'none';
         document.getElementById('empty-state').style.display = 'block';
       } finally {
         btn.disabled = false;
-        uploadedDomains = []; // reset
       }
     }
 
-    function downloadBulkCSV(results) {
-      const headers = ["Domain", "Company Name", "ICP Score", "Rationale"];
-      const rows = results.map(r => [
-        r.domain, 
-        r.name ? `"${r.name.replace(/"/g, '""')}"` : "", 
-        r.icp_score || (r.error ? "Error" : "0"), 
-        `"${(r.rationale || r.error || "").replace(/"/g, '""')}"`
-      ]);
-      
-      const csvContent = "data:text/csv;charset=utf-8," 
-        + headers.join(",") + "\n" 
-        + rows.map(e => e.join(",")).join("\n");
-        
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "gtm_bulk_scores.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  </script>
+    </script>
 </body>
 </html>
