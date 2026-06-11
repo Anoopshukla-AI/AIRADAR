@@ -1,4 +1,4 @@
-# GTM Intelligence Dashboard
+# AIRADAR
 ## Global AI-First Startup Radar · Built by Anoop Shukla
 
 Live pipeline tracking global AI-first startups with ICP scoring, enrichment data,
@@ -32,14 +32,14 @@ wrangler login
 
 ```bash
 cd worker
-wrangler d1 create gtm-intelligence-db
+wrangler d1 create airadar-db
 ```
 
 Copy the `database_id` from the output and paste it into `wrangler.toml`.
 
 Then create the schema:
 ```bash
-wrangler d1 execute gtm-intelligence-db --file=schema.sql
+wrangler d1 execute airadar-db --file=schema.sql
 ```
 
 This creates the tables AND seeds 15 real AI-first startups for the demo.
@@ -65,13 +65,13 @@ wrangler deploy
 ```
 
 Note the Worker URL printed after deployment, e.g.:
-`https://gtm-intelligence.YOUR_ACCOUNT.workers.dev`
+`https://airadar.YOUR_ACCOUNT.workers.dev`
 
 Test it:
 ```bash
-curl https://gtm-intelligence.YOUR_ACCOUNT.workers.dev/api/health
-curl https://gtm-intelligence.YOUR_ACCOUNT.workers.dev/api/stats
-curl https://gtm-intelligence.YOUR_ACCOUNT.workers.dev/api/companies?limit=5
+curl https://airadar.YOUR_ACCOUNT.workers.dev/api/health
+curl https://airadar.YOUR_ACCOUNT.workers.dev/api/stats
+curl https://airadar.YOUR_ACCOUNT.workers.dev/api/companies?limit=5
 ```
 
 ---
@@ -92,7 +92,7 @@ curl https://gtm-intelligence.YOUR_ACCOUNT.workers.dev/api/companies?limit=5
 
 6. **After deployment:** Update the `WORKER_BASE` URL in `frontend/index.html`:
    ```javascript
-   const WORKER_BASE = 'https://gtm-intelligence.YOUR_ACCOUNT.workers.dev';
+   const WORKER_BASE = 'https://airadar.YOUR_ACCOUNT.workers.dev';
    ```
    Commit and push — Cloudflare Pages auto-deploys.
 
@@ -109,14 +109,14 @@ curl https://gtm-intelligence.YOUR_ACCOUNT.workers.dev/api/companies?limit=5
 
 2. The pipeline runs automatically every night at 2 AM UTC
 
-3. Test a manual run: GitHub Actions tab → GTM Intelligence Pipeline → Run workflow
+3. Test a manual run: GitHub Actions tab → AIRADAR Pipeline → Run workflow
 
 ---
 
 ### Step 7 — Add Custom Domain (optional, free)
 
 In Cloudflare Pages → your project → Custom domains:
-- Add your domain (e.g. `gtm.clawoperator.in`)
+- Add your domain (e.g. `airadar.clawoperator.in`)
 - Cloudflare handles the SSL certificate automatically
 
 ---
@@ -153,7 +153,7 @@ python enrich.py
 ## Project Structure
 
 ```
-gtm-dashboard/
+airadar/
 ├── worker/
 │   ├── index.ts          # Cloudflare Worker API
 │   ├── schema.sql        # D1 schema + seed data (15 AI startups)
