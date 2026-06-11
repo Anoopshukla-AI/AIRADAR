@@ -1,7 +1,7 @@
 {
-  "name": "gtm-intelligence-worker",
+  "name": "airadar-worker",
   "version": "1.0.0",
-  "description": "GTM Intelligence Dashboard - Cloudflare Worker",
+  "description": "AIRadar - Cloudflare Worker",
   "main": "index.ts",
   "scripts": {
     "deploy": "wrangler deploy",
