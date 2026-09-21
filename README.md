@@ -1,11 +1,14 @@
-# AIRADAR
-<!-- pr-1 -->
-<!-- pr-2 -->
-## Global AI-First Startup Radar · Built by Anoop Shukla
+# 📊 AIRADAR — Global AI-First Startup Radar & Intelligence Engine
 
-Live pipeline tracking global AI-first startups with ICP scoring, enrichment data, and GPT-generated outreach angles. Updates nightly via GitHub Actions.
+[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
+[![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers_%26_D1-F38020?style=flat-square&logo=cloudflare&logoColor=white)](https://workers.cloudflare.com)
+[![NVIDIA NIM](https://img.shields.io/badge/NVIDIA_NIM-Llama_3.3_70B-76B900?style=flat-square&logo=nvidia&logoColor=white)](https://build.nvidia.com)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://typescriptlang.org)
+[![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
 
-**Stack:** Cloudflare Workers + D1 + Pages · Python enrichment pipeline · NVIDIA NIM (meta/llama-3.3-70b-instruct)
+Live intelligence pipeline tracking global AI-first startups with ICP scoring, enrichment data, and GPT-generated outreach angles. Updates automatically via scheduled GitHub Actions workflows.
+
+**Stack:** Cloudflare Workers + D1 Database + Pages · Python Enrichment Pipeline · NVIDIA NIM (`meta/llama-3.3-70b-instruct`)
 
 ---
 
